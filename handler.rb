@@ -2,7 +2,7 @@
 
 require 'logger'
 
-file = File.open('./log/suwappu.log', File::WRONLY | File::APPEND)
+file = File.open('/home/gameswap/Code/suwappu_protocol_handler/log/suwappu.log', File::WRONLY | File::APPEND)
 @logger = Logger.new(file)
 @logger.level = Logger::INFO
 
@@ -17,15 +17,15 @@ end
 
 def download(uri)
 	file_name = "barcode-#{Time.now.to_i}.pdf"
-	@logger.info "Downloading #{uri} --> /home/tom/Code/suwappu_protocol_handler/tmp/documents/#{file_name}"
-	cmnd = "curl #{uri} -o './tmp/documents/#{file_name}'" 
+	@logger.info "Downloading #{uri} --> /home/gameswap/Code/suwappu_protocol_handler/tmp/documents/#{file_name}"
+	cmnd = "curl #{uri} -o '/home/gameswap/Code/suwappu_protocol_handler/tmp/documents/#{file_name}'" 
 	@logger.info cmnd
 	system cmnd
 	file_name
 end
 
 def print_barcode(local_doc)
-	cmnd = "lpr -P 'Zebra-LP2824' ./tmp/documents/#{local_doc}"
+	cmnd = "lpr -P 'Zebra-LP2824' /home/gameswap/Code/suwappu_protocol_handler/tmp/documents/#{local_doc}"
 	@logger.info cmnd
 	system cmnd
 end
