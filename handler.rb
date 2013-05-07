@@ -12,6 +12,11 @@ def analyze_uri(uri)
 		# Print Command Invoked
 		pdf_path = command_and_uri['print/'.length,command_and_uri.length-1]
 		print_barcode download("http://#{pdf_path}")
+	else
+		if command_and_uri.start_with?('storage/')
+			cmnd, checkpoint, device, slot = command_and_uri.split('/')
+			storage_slot(device,slot)
+		end
 	end
 end
 
@@ -30,6 +35,11 @@ def print_barcode(local_doc)
 	system cmnd
 end
 
+def storage_slot(device,slot)
+	cmnd = "lcdoctl -d #{device} -e #{slot}"
+	@logger.info "Storage :: Slot #{slot} @ #{device}"
+	system cmnd
+end
 
 argument = ARGV[0]
 puts argument

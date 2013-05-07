@@ -5,6 +5,7 @@ Application used to handle suwappu:// protocol.
 
 == Prerequisities
 
+	*	Ubuntu
 	*	Barcode printer must be installed
 	* Chrome
 
