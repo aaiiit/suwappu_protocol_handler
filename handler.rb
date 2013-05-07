@@ -36,9 +36,11 @@ def print_barcode(local_doc)
 end
 
 def storage_slot(device,slot)
-	cmnd = "lcdoctl -d #{device} -e #{slot}"
+	cmnd = "lcdoctl -d 'Dacal DC-300:#{device}' -e #{slot}"
 	@logger.info "Storage :: Slot #{slot} @ #{device}"
+	@logger.info cmnd
 	system cmnd
+	system "sleep 10; lcdoctl -d 'Dacal DC-300:#{device}' -i #{slot}"
 end
 
 argument = ARGV[0]
