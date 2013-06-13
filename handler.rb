@@ -2,7 +2,7 @@
 
 require 'logger'
 
-file = File.open('/home/gameswap/Code/suwappu_protocol_handler/log/suwappu.log', File::WRONLY | File::APPEND)
+file = File.open('/home/tom/Code/suwappu/suwappu_protocol_handler/log/suwappu.log', File::WRONLY | File::APPEND)
 @logger = Logger.new(file)
 @logger.level = Logger::INFO
 
@@ -16,21 +16,27 @@ def analyze_uri(uri)
 		if command_and_uri.start_with?('storage/')
 			cmnd, checkpoint, device, slot = command_and_uri.split('/')
 			storage_slot(device,slot)
+		elsif
+			if command_and_uri.start_with?('picture/')
+				swap_number = command_and_uri['picture/'.length,command_and_uri.length-1]
+				puts "::::: #{swap_number}"
+				take_picture swap_number
+			end
 		end
 	end
 end
 
 def download(uri)
 	file_name = "barcode-#{Time.now.to_i}.pdf"
-	@logger.info "Downloading #{uri} --> /home/gameswap/Code/suwappu_protocol_handler/tmp/documents/#{file_name}"
-	cmnd = "curl #{uri} -o '/home/gameswap/Code/suwappu_protocol_handler/tmp/documents/#{file_name}'" 
+	@logger.info "Downloading #{uri} --> /home/tom/Code/suwappu/suwappu_protocol_handler/tmp/documents/#{file_name}"
+	cmnd = "curl #{uri} -o '/home/tom/Code/suwappu/suwappu_protocol_handler/tmp/documents/#{file_name}'" 
 	@logger.info cmnd
 	system cmnd
 	file_name
 end
 
 def print_barcode(local_doc)
-	cmnd = "lpr -P 'Zebra-LP2824' /home/gameswap/Code/suwappu_protocol_handler/tmp/documents/#{local_doc}"
+	cmnd = "lpr -P 'Zebra-LP2824' /home/tom/Code/suwappu/suwappu_protocol_handler/tmp/documents/#{local_doc}"
 	@logger.info cmnd
 	system cmnd
 end
@@ -41,6 +47,13 @@ def storage_slot(device,slot)
 	@logger.info cmnd
 	system cmnd
 	system "sleep 10; lcdoctl -d 'Dacal DC-300:#{device}' -i #{slot}"
+end
+
+def take_picture(swap_number)
+	cmnd = "streamer -o /tmp/#{swap_number}.jpeg && scp /tmp/#{swap_number}.jpeg deployer@inventorycontrol:/u/apps/inventorycontrol/shared/images/"
+	@logger.info "take_picture"
+	@logger.info cmnd
+	system cmnd
 end
 
 argument = ARGV[0]
