@@ -6,7 +6,9 @@ Application used to handle suwappu:// protocol.
 == Prerequisities
 
 	*	Ubuntu
-	*	Barcode printer must be installed
+	*	Barcode printer must be installed for printing
+  * Scanner must be installed for scanning (scanimage -L)
+  * Dacal machine should be working through commands
 	* Chrome
 
 

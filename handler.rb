@@ -8,21 +8,25 @@ file = File.open('/home/tom/Code/suwappu/suwappu_protocol_handler/log/suwappu.lo
 
 def analyze_uri(uri)
 	command_and_uri = uri.split(/\/\//)[1]
-	if command_and_uri.start_with?('print/')
-		# Print Command Invoked
-		pdf_path = command_and_uri['print/'.length,command_and_uri.length-1]
-		print_barcode download("http://#{pdf_path}")
+
+	i = command_and_uri.index(/\//)
+	command = command_and_uri[0..i-1]
+	i = (command_and_uri.length - i - 1)*-1
+	argument = command_and_uri[i..-1]
+
+	case command
+	when 'print'
+		uri = "http://#{argument}"
+		print_barcode download(uri)
+	when 'storage'
+		checkpoint, device, slot = argument.split('/')
+		storage_slot device,slot
+	when 'picture'
+		take_picture argument
+	when 'scan'
+		scan argument
 	else
-		if command_and_uri.start_with?('storage/')
-			cmnd, checkpoint, device, slot = command_and_uri.split('/')
-			storage_slot(device,slot)
-		elsif
-			if command_and_uri.start_with?('picture/')
-				swap_number = command_and_uri['picture/'.length,command_and_uri.length-1]
-				puts "::::: #{swap_number}"
-				take_picture swap_number
-			end
-		end
+		puts "Command #{command} not found!"
 	end
 end
 
@@ -52,6 +56,21 @@ end
 def take_picture(swap_number)
 	cmnd = "streamer -o /tmp/#{swap_number}.jpeg && scp /tmp/#{swap_number}.jpeg deployer@inventorycontrol:/u/apps/inventorycontrol/shared/images/"
 	@logger.info "take_picture"
+	@logger.info cmnd
+	system cmnd
+end
+
+def scan(swap_number)
+	scanner = 'hpaio:/net/HP_Color_LaserJet_2840?ip=192.168.11.31'
+	file = "/tmp/#{swap_number}"
+	cmnd = "scanimage -d #{scanner}	--resolution=300 > #{file}.pnm"
+	@logger.info "scan"
+	@logger.info cmnd
+	system cmnd
+	cmnd = "pnmtops #{file}.pnm > #{file}.ps"
+	@logger.info cmnd
+	system cmnd
+	cmnd = "ps2pdf #{file}.ps #{file}.pdf"
 	@logger.info cmnd
 	system cmnd
 end
