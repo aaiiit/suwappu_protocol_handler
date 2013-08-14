@@ -1,14 +1,36 @@
 <html>
 	<head>
 		<title>Suwappu Protocol Test Page</title>
+		<script src="http://js.pusher.com/2.1/pusher.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+		<script>
+			Pusher.host = 'pusher';
+			Pusher.ws_port = 8080;
+			var pusher = new Pusher('71ea26969299b55eca1a',{'secret': '063c8f72e55c99814a02'});
+			var channel = pusher.subscribe('suwappu_handler');
+			
+			channel.bind('scan_completed',
+				function(data) {
+					console.log("scan_completed  " + data['swap_number']);
+					$('#scan').html('<a href="' + data['file'] + '">' + data['swap_number'] + '</a>');
+					}
+				);
+			channel.bind('take_picture_completed',
+				function(data) {
+					$('#picture').html('<a href="' + data['file'] + '">' + data['swap_number'] + '</a>');
+					}
+				);
+		</script>
 	</head>
 	<body>
 		<h1>Suwappu Protocol Test Page</h1>
 		<ul>
 			<li><a href="suwappu://print/inventorycontrol/drop_offs/380/barcode.pdf">Print Barcode</a></li>
 			<li><a href="suwappu://storage/gameswap-hq/5f03/10">Open Storage Slot 10 on Device 5f03 @ Checkpoint Gameswap HQ</a></li>
-			<li><a href="suwappu://picture/1001000000009">Take Picture of item with barcode 1001000000009</a></li>
-			<li><a href="suwappu://scan/1001000000009">Scan (image) item with barcode 1001000000009</a></li>
+			<li>
+			<div id="picture"><a href="suwappu://picture/1001000000009">Take Picture of item with barcode 1001000000009</a></div>
+			</li>
+			<li><div id='scan'><a href="suwappu://scan/1001000000009">Scan (image) item with barcode 1001000000009</a></div></li>
 		</ul>
 	</body>
 </html>
