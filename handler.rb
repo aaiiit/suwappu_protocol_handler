@@ -1,22 +1,16 @@
-#!/home/tom/.rvm/rubies/ruby-1.9.3-p448/bin/ruby 
+#!/home/tom/.rvm/rubies/ruby-2.0.0-p481/bin/ruby
 
 require 'logger'
-require 'eventmachine'
-require 'faye'
-# require 'pusher'
-# require 'pusher-client'
 require 'base64'
+require 'rubygems'
+require 'ffi-rzmq'
 
-file = File.open('./log/suwappu.log', File::WRONLY | File::APPEND)
+dir = File.dirname(__FILE__)
+file = File.open("#{dir}/log/suwappu.log", File::WRONLY | File::APPEND)
 ASSETS_DIR = "/mnt/Data/Assets"
 
 @logger = Logger.new(file)
 @logger.level = Logger::INFO
-# Pusher.app_id = 45972
-# Pusher.key = '71ea26969299b55eca1a'
-# Pusher.secret = '063c8f72e55c99814a02' 
-# Pusher.host = '192.168.1.11'
-# Pusher.port = 4567
 
 def analyze_uri(uri)
 	command_and_uri = uri.split(/\/\//)[1]
@@ -34,21 +28,16 @@ def analyze_uri(uri)
 		checkpoint, device, slot = argument.split('/')
 		storage_slot device,slot
 	when 'picture'
-		take_picture argument
+    print_barcode argument,argument
+		#take_picture argument
 	when 'scan'
 		scan argument
 	else
 		puts "Command #{command} not found!"
 	end
-
-	
 end
 
 def event_completed(command,argument)
-  EM.run {
-    client = Faye::Client.new('http://localhost:3000/faye')
-    client.publish("/#{command}/completed",argument)
-  }
   @logger.info "Event suwappu_handler##{command}_completed called"
 end
 
@@ -61,11 +50,26 @@ def download(uri)
 	file_name
 end
 
-def print_barcode(local_doc)
-	cmnd = "lpr -P 'Zebra-LP2824' /home/tom/Code/suwappu/suwappu_protocol_handler/tmp/documents/#{local_doc}"
-	@logger.info cmnd
-	system cmnd
-	event_completed('print_barcode',{file: local_doc})
+def print_barcode(barcode,label)
+	#cmnd = "lpr -P 'Zebra-LP2824' /home/tom/Code/suwappu/suwappu_protocol_handler/tmp/documents/#{local_doc}"
+  system "touch /tmp/1"
+  ctx = ZMQ::Context.new()
+  socket = ctx.socket(ZMQ::PUB)
+  socket.bind('tcp://192.168.11.5:7001')
+  socket.bind("ipc://pubz.ipc")
+  system "touch /tmp/2"
+  sleep 1.5 # HACK : To make sure the connection is setup
+  puts "Printing #{barcode} with label #{label}"
+  socket.send_string("#{barcode};#{label}")
+  puts "Printed"
+  socket.close 
+  system "touch /tmp/3"
+	#@logger.info cmnd
+	#system cmnd
+	#event_completed('print_barcode',{file: local_doc})
+end
+
+def zmq_pub(address,filter,msg)
 end
 
 def storage_slot(device,slot)

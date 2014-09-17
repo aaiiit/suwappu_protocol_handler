@@ -1,0 +1,5 @@
+[Added Associations]
+application/pdf=display.im6.desktop;
+
+[Default Applications]
+x-scheme-handler/suwappu=.local/share/applications/suwappu.desktop

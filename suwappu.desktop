@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Suwappu
+Exec=/Code/suwappu/suwappu_protocol_handler/handler %u
+Icon=emacs-icon
+Type=Application
+Terminal=false
+MimeType=x-scheme-handler/suwappu
