@@ -55,7 +55,7 @@ def print_barcode(barcode,label)
   system "touch /tmp/1"
   ctx = ZMQ::Context.new()
   socket = ctx.socket(ZMQ::PUB)
-  socket.bind('tcp://192.168.11.5:7001')
+  socket.bind('tcp://tcp://10.0.0.6:6001')
   socket.bind("ipc://pubz.ipc")
   system "touch /tmp/2"
   sleep 1.5 # HACK : To make sure the connection is setup

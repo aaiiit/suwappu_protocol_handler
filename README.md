@@ -30,3 +30,12 @@ Application used to handle suwappu:// protocol.
 	Terminal=false
 	Categories=Development;Engineering;Electronics;
 	MimeType=text/x-suwappu;x-scheme-handler/suwappu;
+
+
+= Add to Iceweasel
+
+  You may try to edit Firefox configuration via about:config:
+
+  * network.protocol-handler.expose.komodo: true (This protocol should be handled either by the browser or by an external application)
+  * network.protocol-handler.external.komodo: true (This protocol should be handled by an external application)
+  * network.protocol-handler.app.komodo: python /path/to/my/script.py (Path to a program to handle the request)
